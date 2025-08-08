@@ -1,13 +1,30 @@
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "Flozka" },
+    { name: "description", content: "Florist Batam" },
   ];
 }
 
-export default function Home() {
-  return <Welcome />;
+export async function clientLoader({}: Route.ClientLoaderArgs) {
+  const response = await fetch(`http://localhost:3000/products`);
+  const products = await response.json();
+  return products;
+}
+
+export default function Home({ loaderData }: Route.ComponentProps) {
+  const products = loaderData;
+
+  return (
+    <div>
+      <h1>Flozka</h1>
+
+      <ul>
+        {products.map((product: any) => {
+          return <li key={product.id}>{product.name}</li>;
+        })}
+      </ul>
+    </div>
+  );
 }
