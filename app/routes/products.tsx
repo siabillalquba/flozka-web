@@ -7,7 +7,7 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export async function clientLoader({}: Route.ClientLoaderArgs) {
+export async function clientLoader() {
   const response = await fetch(
     `${import.meta.env.VITE_BACKEND_API_URL}/products`
   );
