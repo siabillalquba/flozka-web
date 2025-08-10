@@ -1,9 +1,9 @@
-import type { Route } from "./+types/home";
+import type { Route } from "./+types/products";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Flozka" },
-    { name: "description", content: "Florist Batam" },
+    { title: "Products of Flozka" },
+    // { name: "description", content: "Florist Batam" },
   ];
 }
 
