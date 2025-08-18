@@ -22,6 +22,9 @@ export default function HomeRoute({ loaderData }: Route.ComponentProps) {
 
   return (
     <div>
+      <h1 className="text-2xl font-bold flex justify-center">
+        Products of Flozka
+      </h1>
       <ProductsGrid products={products} />
     </div>
   );
