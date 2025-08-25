@@ -22,8 +22,8 @@ export function Header() {
         </div>
 
         {/* Navigation links centered below logo */}
-        <nav className="flex justify-center">
-          <ul className="flex text-emerald-900/90 font-semibold py-2 ">
+        <nav className="flex items-center justify-evenly">
+          <ul className="flex text-emerald-900/90 font-semibold ">
             {navigationLinks.map((navigationLink) => (
               <li key={navigationLink.to}>
                 <Link
