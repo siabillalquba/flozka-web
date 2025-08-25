@@ -10,5 +10,9 @@ export default [
     index("routes/home.tsx"),
     route("products", "./routes/products.tsx"),
     route("products/:slug", "./routes/products-slug.tsx"),
+
+    route("register", "./routes/register.tsx"), // POST /auth/register
+    route("login", "./routes/login.tsx"), // POST /auth/login
+    route("dashboard", "./routes/dashboard.tsx"), // GET /auth/me
   ]),
 ] satisfies RouteConfig;
