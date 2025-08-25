@@ -22,7 +22,7 @@ export default function HomeRoute({ loaderData }: Route.ComponentProps) {
 
   return (
     <div>
-      <section className="m-40">
+      <section className="m-20">
         <p className="font-bold text-3xl text-center">Made by love & request</p>
       </section>
       <ProductsGrid products={products} />
