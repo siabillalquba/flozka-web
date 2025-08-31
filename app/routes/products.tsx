@@ -3,10 +3,7 @@ import type { Route } from "./+types/products";
 import type { Product } from "~/modules/product/type";
 
 export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "Products of Flozka" },
-    // { name: "description", content: "Florist Batam" },
-  ];
+  return [{ title: "Products of Flozka" }];
 }
 
 export async function clientLoader() {
