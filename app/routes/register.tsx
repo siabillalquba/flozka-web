@@ -4,51 +4,29 @@ import { Form } from "react-router";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
+import { Card, CardDescription, CardTitle } from "~/components/ui/card";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Register" }];
 }
 
+export async function clientAction({ request }: Route.ClientActionArgs) {
+  const formData = await request.formData();
+
+  const fullName = formData.get("fullName");
+  const email = formData.get("email");
+  const password = formData.get("password");
+
+  console.log({
+    fullName,
+    email,
+    password,
+  });
+
+  return null;
+}
+
 export default function RegisterRoute({}: Route.ComponentProps) {
-  // const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   setIsSubmitting(true);
-
-  //   try {
-  //     const formData = new FormData(e.currentTarget);
-  //     const data = {
-  //       fullName: formData.get("fullName") as string,
-  //       email: formData.get("email") as string,
-  //       password: formData.get("password") as string,
-  //     };
-
-  //     // TODO: Implement your registration API call here
-  //     console.log("Form submitted with data:", data);
-
-  //     // Simulate API call delay
-  //     await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  //     // TODO: Handle successful registration (redirect, show success message, etc.)
-  //     alert("Registration successful!");
-  //   } catch (error) {
-  //     console.error("Registration failed:", error);
-  //     // TODO: Handle error (show error message, etc.)
-  //     alert("Registration failed. Please try again.");
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
-
   return (
     <div className=" flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
