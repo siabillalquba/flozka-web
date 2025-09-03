@@ -4,12 +4,18 @@ import { Form, redirect } from "react-router";
 import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
+import { commitSession, getSession } from "~/sessions";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Login" }];
 }
 
-export async function clientAction({ request }: Route.ClientActionArgs) {
+export async function action({ request }: Route.ActionArgs) {
+  const session = await getSession(request.headers.get("Cookie"));
+  if (session.has("token")) {
+    return redirect("/dashboard");
+  }
+
   const formData = await request.formData();
 
   const email = formData.get("email");
@@ -30,9 +36,15 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
       body: JSON.stringify(loginBody),
     }
   );
-  const result = await response.json();
+  const token = await response.json();
 
-  return redirect("/dashboard");
+  session.set("token", token);
+
+  return redirect("/dashboard", {
+    headers: {
+      "Set-Cookie": await commitSession(session),
+    },
+  });
 }
 
 export default function LoginRoute({}: Route.ComponentProps) {
