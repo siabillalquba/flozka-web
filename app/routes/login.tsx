@@ -1,12 +1,38 @@
 import { Card, CardDescription, CardTitle } from "~/components/ui/card";
 import type { Route } from "./+types/login";
-import { Form } from "react-router";
+import { Form, redirect } from "react-router";
 import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Login" }];
+}
+
+export async function clientAction({ request }: Route.ClientActionArgs) {
+  const formData = await request.formData();
+
+  const email = formData.get("email");
+  const password = formData.get("password");
+
+  const loginBody = {
+    email,
+    password,
+  };
+
+  const response = await fetch(
+    `${import.meta.env.VITE_BACKEND_API_URL}/auth/login`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(loginBody),
+    }
+  );
+  const result = await response.json();
+
+  return redirect("/dashboard");
 }
 
 export default function LoginRoute({}: Route.ComponentProps) {
@@ -21,7 +47,7 @@ export default function LoginRoute({}: Route.ComponentProps) {
             Continue to your account
           </CardDescription>
 
-          <Form method="post" className="space-y-4 p-4">
+          <Form method="POST" className="space-y-4 p-4">
             <div className="space-y-2">
               <Label
                 htmlFor="email"

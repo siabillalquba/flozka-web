@@ -50,7 +50,7 @@ export default function RegisterRoute({}: Route.ComponentProps) {
             Join us today and start your journey
           </CardDescription>
 
-          <Form method="post" className="space-y-4 p-4">
+          <Form method="POST" className="space-y-4 p-4">
             <div className="space-y-2">
               <Label
                 htmlFor="fullName"
