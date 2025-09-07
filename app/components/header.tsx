@@ -8,7 +8,21 @@ const navigationLinks = [
   { to: "/dashboard", text: "Dashboard" },
 ];
 
+// export async function loader({ request }: Route.ClientLoaderArgs) {
+//   const session = await getSession(request.headers.get("Cookie"));
+//   const token = session.get("token");
+//   const response = await fetch(
+//     `${import.meta.env.VITE_BACKEND_API_URL}/auth/me`,
+//     { headers: { Authorization: `Bearer ${token}` } }
+//   );
+//   const user: UserAuthMe = await response.json();
+//   return { user };
+// }
+
 export function Header() {
+  // export default function DashboardRoute({ loaderData }: Route.ComponentProps) {
+  //   const { user } = loaderData;
+
   return (
     <header className="bg-white py-6">
       <div className="container mx-auto px-4">
@@ -34,13 +48,20 @@ export function Header() {
                   {navigationLink.text}
                 </Link>
                 {/* <a href="/" className="hover:text-black transition-colors">
-                Home
-              </a> */}
+        Home
+      </a> */}
               </li>
             ))}
+            {/* {user.fullName && (
+            <li>
+              <div>
+                <p>{user.fullName}</p>
+              </div>
+            </li>
+          )} */}
           </ul>
         </nav>
       </div>
     </header>
   );
-}
+} // import { Link } from "react-router";
