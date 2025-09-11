@@ -5,7 +5,7 @@ import { Button } from "~/components/ui/button";
 import { destroySession, getSession } from "~/sessions";
 
 export function meta({}: Route.MetaArgs) {
-  return [{ title: "Login" }];
+  return [{ title: "Logout" }];
 }
 
 export async function action({ request }: Route.ActionArgs) {

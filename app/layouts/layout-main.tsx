@@ -3,7 +3,7 @@ import type { Route } from "./+types/layout-main";
 import { getSession } from "~/sessions";
 import type { UserAuthMe } from "~/modules/user/type";
 
-const navigationLinks = [
+const navigationLinksDefault = [
   { to: "/", text: "Home" },
   { to: "/products", text: "Products" },
   { to: "/register", text: "Register" },
@@ -11,19 +11,32 @@ const navigationLinks = [
   { to: "/dashboard", text: "Dashboard" },
 ];
 
+const navigationLinksAuth = [
+  { to: "/", text: "Home" },
+  { to: "/products", text: "Products" },
+  { to: "/logout", text: "Logout" },
+  { to: "/dashboard", text: "Dashboard" },
+];
+
 export async function loader({ request }: Route.ClientLoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
   const token = session.get("token");
+
   const response = await fetch(
     `${import.meta.env.VITE_BACKEND_API_URL}/auth/me`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
   const user: UserAuthMe = await response.json();
-  return { user };
+  const isAuthenticated = token ? true : false;
+  const navigationLinks = isAuthenticated
+    ? navigationLinksAuth
+    : navigationLinksDefault;
+  return { user, navigationLinks };
 }
 
 export default function LayoutMain({ loaderData }: Route.ComponentProps) {
-  const { user } = loaderData;
+  const { user, navigationLinks } = loaderData;
+
   return (
     <div className="flex min-h-screen flex-col">
       <header className="bg-white py-6">
@@ -57,7 +70,7 @@ export default function LayoutMain({ loaderData }: Route.ComponentProps) {
               {user.fullName && (
                 <li>
                   <div>
-                    <p>{user.fullName}</p>
+                    <p className="text-black">{user.fullName}</p>
                   </div>
                 </li>
               )}
