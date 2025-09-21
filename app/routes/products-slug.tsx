@@ -6,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { destroySession, getSession } from "~/sessions";
+import { Form, redirect } from "react-router";
+import type { AddCartItem } from "~/modules/cart/schema";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "(Product Name) of Flozka" }];
@@ -30,6 +33,43 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
   }
 }
 
+export async function action({ request }: Route.ActionArgs) {
+  const session = await getSession(request.headers.get("Cookie"));
+  const token = session.get("token");
+
+  if (!session.has("token")) {
+    return redirect("/login");
+  }
+
+  const formData = await request.formData();
+
+  const addCartItemData: AddCartItem = {
+    productId: String(formData.get("productId")),
+    quantity: Number(formData.get("quantity")),
+  };
+
+  const response = await fetch(
+    `${process.env.VITE_BACKEND_API_URL}/cart/items`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(addCartItemData),
+    }
+  );
+
+  if (!response.ok) {
+    session.flash("error", "Failed to add item to cart");
+    return redirect("/login", {
+      headers: { "Set-Cookie": await destroySession(session) },
+    });
+  }
+
+  return redirect("/cart");
+}
+
 export default function HomeRoute({ loaderData }: Route.ComponentProps) {
   const { product } = loaderData;
   const [quantity, setQuantity] = useState(1);
@@ -40,10 +80,10 @@ export default function HomeRoute({ loaderData }: Route.ComponentProps) {
     }
   };
 
-  const handleAddToCart = () => {
-    // TODO: Implement add to cart functionality
-    console.log(`Adding ${quantity} of ${product.name} to cart`);
-  };
+  // const handleAddToCart = () => {
+  //   // TODO: Implement add to cart functionality
+  //   console.log(`Adding ${quantity} of ${product.name} to cart`);
+  // };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("id-ID", {
@@ -138,83 +178,92 @@ export default function HomeRoute({ loaderData }: Route.ComponentProps) {
 
             {/* Add to Cart Form */}
             <Card className="border-green-200 bg-white/50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-gray-800">
-                  Add to Cart
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Quantity Controls */}
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="quantity"
-                    className="text-gray-700 font-medium"
-                  >
-                    Quantity
-                  </Label>
-                  <div className="flex items-center space-x-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleQuantityChange(quantity - 1)}
-                      className="w-10 h-10 rounded-full border-green-300 hover:border-green-500 hover:bg-green-50"
+              <Form method="POST">
+                <input
+                  type="hidden"
+                  name="productId"
+                  defaultValue={product.id}
+                />
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg text-gray-800">
+                    Add to Cart
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Quantity Controls */}
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="quantity"
+                      className="text-gray-700 font-medium"
                     >
-                      -
-                    </Button>
-                    <Input
-                      id="quantity"
-                      type="number"
-                      value={quantity}
-                      onChange={(e) =>
-                        handleQuantityChange(parseInt(e.target.value) || 1)
-                      }
-                      min="1"
-                      className="w-20 text-center border-green-300 focus:border-green-500 focus:ring-green-500"
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleQuantityChange(quantity + 1)}
-                      className="w-10 h-10 rounded-full border-green-300 hover:border-green-500 hover:bg-green-50"
-                    >
-                      +
-                    </Button>
+                      Quantity
+                    </Label>
+                    <div className="flex items-center space-x-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleQuantityChange(quantity - 1)}
+                        className="w-10 h-10 rounded-full border-green-300 hover:border-green-500 hover:bg-green-50"
+                      >
+                        -
+                      </Button>
+                      <Input
+                        name="quantity"
+                        type="number"
+                        value={quantity}
+                        onChange={(e) =>
+                          handleQuantityChange(parseInt(e.target.value) || 1)
+                        }
+                        min="1"
+                        className="w-20 text-center border-green-300 focus:border-green-500 focus:ring-green-500"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleQuantityChange(quantity + 1)}
+                        className="w-10 h-10 rounded-full border-green-300 hover:border-green-500 hover:bg-green-50"
+                      >
+                        +
+                      </Button>
+                    </div>
                   </div>
-                </div>
 
-                {/* 
+                  {/* 
                 // Total Price
                 <div className="flex justify-between items-center py-3 px-4 bg-green-50 rounded-lg border border-green-200">
                   <span className="text-gray-700 font-medium">
                     Subtotal:
                   </span>
                   <span className="text-2xl font-bold text-emerald-900/90">
-                    {formatPrice(product.price * quantity)}
+                  {formatPrice(product.price * quantity)}
                   </span>
-                </div> 
-                */}
+                  </div> 
+                  */}
 
-                {/* Add to Cart Button */}
-                <Button
-                  onClick={handleAddToCart}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-lg font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"
-                >
-                  <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                  {/* Add to Cart Button */}
+                  <Button
+                    type="submit"
+                    className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-lg font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"
-                    />
-                  </svg>
-                  Add to Cart
-                </Button>
-              </CardContent>
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"
+                      />
+                    </svg>
+                    Add to Cart
+                  </Button>
+                </CardContent>
+              </Form>
             </Card>
           </div>
         </div>
