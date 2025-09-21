@@ -1,5 +1,5 @@
 import { Card, CardDescription, CardTitle } from "~/components/ui/card";
-import type { Route } from "./+types/login";
+import type { Route } from "./+types/logout";
 import { Form, redirect } from "react-router";
 import { Button } from "~/components/ui/button";
 import { destroySession, getSession } from "~/sessions";

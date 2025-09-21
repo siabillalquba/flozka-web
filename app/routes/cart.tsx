@@ -1,11 +1,12 @@
 import { destroySession, getSession } from "~/sessions";
-import type { Route } from "./+types/dashboard";
+import type { Route } from "./+types/cart";
 import type { UserAuthMe } from "~/modules/user/type";
 import { Card } from "~/components/ui/card";
 import { redirect } from "react-router";
+import type { Cart } from "~/modules/cart/schema";
 
 export function meta({}: Route.MetaArgs) {
-  return [{ title: "Dashboard" }];
+  return [{ title: "Cart" }];
 }
 
 export async function loader({ request }: Route.ClientLoaderArgs) {
@@ -16,7 +17,7 @@ export async function loader({ request }: Route.ClientLoaderArgs) {
     return redirect("/login");
   }
 
-  const response = await fetch(`${process.env.VITE_BACKEND_API_URL}/auth/me`, {
+  const response = await fetch(`${process.env.VITE_BACKEND_API_URL}/cart`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -25,28 +26,20 @@ export async function loader({ request }: Route.ClientLoaderArgs) {
   });
 
   if (!response.ok) {
-    session.flash("error", "Failed to check user");
     return redirect("/login", {
       headers: { "Set-Cookie": await destroySession(session) },
     });
   }
 
-  const user: UserAuthMe = await response.json();
-  return { user };
+  const cart: Cart = await response.json();
+  return { cart };
 }
 
-export default function DashboardRoute({ loaderData }: Route.ComponentProps) {
-  const { user } = loaderData;
-
+export default function CartRoute({ loaderData }: Route.ComponentProps) {
   return (
-    <div className="flex flex-col items-center">
-      <div className="w-full max-w-xs">
-        <h1>Dashboard</h1>
-        <Card>
-          <h2>{user.fullName}</h2>
-          <p>{user.email}</p>
-        </Card>
-      </div>
+    <div className="container mx-auto py-10">
+      <h1 className="mb-8 text-3xl font-bold">Shopping Cart</h1>
+      <pre>{JSON.stringify(loaderData, null, 2)}</pre>
     </div>
   );
 }
