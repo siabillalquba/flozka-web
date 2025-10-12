@@ -10,6 +10,17 @@ export function meta({}: Route.MetaArgs) {
   return [{ title: "Login" }];
 }
 
+export async function loader({ request }: Route.ClientLoaderArgs) {
+  const session = await getSession(request.headers.get("Cookie"));
+  const token = session.get("token");
+
+  if (session.has("token")) {
+    return redirect("/dashboard");
+  }
+
+  return null;
+}
+
 export async function action({ request }: Route.ActionArgs) {
   const session = await getSession(request.headers.get("Cookie"));
   if (session.has("token")) {
